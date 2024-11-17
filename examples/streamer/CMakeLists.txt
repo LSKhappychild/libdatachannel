@@ -4,7 +4,7 @@ if(POLICY CMP0079)
 endif()
 
 set(STREAMER_SOURCES
-	main.cpp
+	server.cpp
 	dispatchqueue.cpp
 	dispatchqueue.hpp
 	h264fileparser.cpp
@@ -21,6 +21,10 @@ set(STREAMER_SOURCES
 	ArgParser.hpp
 )
 
+set(CLIENT_SOURCES
+	client.cpp
+)
+
 set(STREAMER_UWP_RESOURCES
 	uwp/Logo.png
 	uwp/package.appxManifest
@@ -35,17 +39,23 @@ if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
 	add_executable(streamer ${STREAMER_SOURCES} ${STREAMER_UWP_RESOURCES})
 else()
 	add_executable(streamer ${STREAMER_SOURCES})
+	add_executable(client ${CLIENT_SOURCES})
 endif()
 
 set_target_properties(streamer PROPERTIES
 	CXX_STANDARD 17
 	OUTPUT_NAME streamer)
 
+set_target_properties(client PROPERTIES
+	CXX_STANDARD 17
+	OUTPUT_NAME client)
+	
 set_target_properties(streamer PROPERTIES
 	XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER com.github.paullouisageneau.libdatachannel.examples.streamer)
 
 find_package(Threads REQUIRED)
 target_link_libraries(streamer LibDataChannel::LibDataChannel Threads::Threads nlohmann_json::nlohmann_json)
+target_link_libraries(client LibDataChannel::LibDataChannel Threads::Threads nlohmann_json::nlohmann_json)
 
 if(MSVC)
 	add_custom_command(TARGET streamer POST_BUILD
